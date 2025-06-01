@@ -202,7 +202,7 @@ def cambiar_contraseña(
     db_usuario = db.query(models.Usuario).filter(models.Usuario.id_usuario == usuario_id).first()
     if db_usuario is None:
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
-    db_usuario.contraseña = nueva_contraseña  # En producción, hashea la contraseña
+    db_usuario.contraseña = pwd_context.hash(nueva_contraseña)
     db.commit()
     return {"msg": "Contraseña actualizada correctamente"}
 
