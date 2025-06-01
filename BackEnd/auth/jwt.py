@@ -5,6 +5,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 import jwt  # Cambiado de jose.jwt a jwt
 from sqlalchemy.orm import Session
+from passlib.context import CryptContext
 
 from database import get_db
 import models
@@ -22,6 +23,8 @@ ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
 # Configuración del OAuth2
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
 # Funciones para autenticación de usuarios
 def get_user(db: Session, email: str):
     return db.query(models.Usuario).filter(models.Usuario.email == email).first()
@@ -30,8 +33,8 @@ def authenticate_user(db: Session, email: str, password: str):
     user = get_user(db, email)
     if not user:
         return False
-    # Comparación directa ya que el hash viene del frontend
-    if user.contraseña != password:
+    # Verifica el hash de la contraseña
+    if not pwd_context.verify(password, user.contraseña):
         return False
     return user
 
