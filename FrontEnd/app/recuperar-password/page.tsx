@@ -22,12 +22,26 @@ export default function RecuperarPasswordPage() {
     setIsLoading(true)
     setError(null)
 
+    if (!email) {
+      setError("Introduce tu email")
+      return
+    }
+
     try {
-      await axios.post(`${import.meta.env.VITE_BACKEND_URL}/usuarios/recuperar-contraseña`, { email })
+      console.log("Enviando email de recuperación a:", email)
+      await axios.post(`${import.meta.env.VITE_BACKEND_URL}/usuarios/recuperar-contraseña`, { email: email })
       setIsSuccess(true)
     } catch (error: any) {
       if (error.response && error.response.data && error.response.data.detail) {
-        setError(error.response.data.detail)
+        const detail = error.response.data.detail
+        if (Array.isArray(detail)) {
+          // Si es un array de errores de validación
+          setError(detail.map((err: any) => err.msg).join(" | "))
+        } else if (typeof detail === "string") {
+          setError(detail)
+        } else {
+          setError("Error desconocido")
+        }
       } else {
         setError("Error al enviar el email. Inténtalo de nuevo más tarde.")
       }
