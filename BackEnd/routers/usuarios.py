@@ -6,6 +6,8 @@ import jwt
 import os
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
+from passlib.context import CryptContext
+
 load_dotenv()
 
 from database import get_db
@@ -32,6 +34,7 @@ conf = ConnectionConfig(
     USE_CREDENTIALS = True
 )
 
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 @router.get("/confirmar-email")
 def confirmar_email(token: str, db: Session = Depends(get_db)):
@@ -67,7 +70,7 @@ def confirmar_email(token: str, db: Session = Depends(get_db)):
     db_usuario = models.Usuario(
         nombre=nombre,
         email=email,
-        contraseña=contraseña,
+        contraseña=pwd_context.hash(contraseña),  # Hashea aquí
         id_rol=id_rol_int,
         is_active=is_active,
         telefono=telefono
@@ -88,8 +91,8 @@ def create_usuario(usuario: schemas.UsuarioCreate, db: Session = Depends(get_db)
     db_usuario = models.Usuario(
         nombre=usuario.nombre,
         email=usuario.email,
-        contraseña=usuario.contraseña,  # Ya viene hasheada del frontend
-        id_rol=usuario.id_rol,  # Cambiado de rol a id_rol
+        contraseña=pwd_context.hash(usuario.contraseña),  # Hashea aquí
+        id_rol=usuario.id_rol,
         is_active=usuario.is_active,
         telefono=usuario.telefono
     )
