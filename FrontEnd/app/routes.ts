@@ -28,6 +28,7 @@ export default [
   ...prefix("pagar", [index("./pagar/page.tsx"), route("exito", "./pagar/exito/page.tsx"), route("fallo", "./pagar/fallo/page.tsx")]),
   route("perfil", "./perfil/page.tsx"),
   route("recuperar-password", "./recuperar-password/page.tsx"),
+  route("resetear-contraseña", "./recuperar-password/reset.tsx"),
   route("reenviar-confirmacion", "./reenviar-confirmacion/page.tsx"),
   route("registro", "./registro/page.tsx"),
 ] satisfies RouteConfig;
