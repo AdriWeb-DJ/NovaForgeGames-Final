@@ -7,6 +7,7 @@ import os
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
 from passlib.context import CryptContext
+from pydantic import BaseModel
 
 load_dotenv()
 
@@ -206,12 +207,16 @@ def cambiar_contraseña(
     db.commit()
     return {"msg": "Contraseña actualizada correctamente"}
 
+class EmailRequest(BaseModel):
+    email: str
+
 @router.post("/recuperar-contraseña", status_code=200)
 async def recuperar_contraseña(
-    email: str = Body(...),
+    data: EmailRequest,
     db: Session = Depends(get_db)
 ):
-    usuario = db.query(models.Usuario).filter(models.Usuario.email == email).first()
+    print("EMAIL RECIBIDO:", data.email)
+    usuario = db.query(models.Usuario).filter(models.Usuario.email == data.email).first()
     if not usuario:
         raise HTTPException(status_code=404, detail="No existe un usuario con ese email")
 
@@ -253,6 +258,10 @@ def resetear_contraseña(
     usuario = db.query(models.Usuario).filter(models.Usuario.id_usuario == usuario_id).first()
     if not usuario:
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
+
+    usuario.contraseña = pwd_context.hash(nueva_contraseña)  # Hashea aquí
+    db.commit()
+    return {"msg": "Contraseña restablecida correctamente"}
 
     usuario.contraseña = nueva_contraseña  # En producción, hashea la contraseña
     db.commit()
