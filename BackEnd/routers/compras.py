@@ -67,6 +67,7 @@ def read_compras(skip: int = 0, limit: int = 100, db: Session = Depends(get_db))
             "usuario_email": usuario.email if usuario else "",
             "fecha_compra": compra.fecha_compra,
             "total": compra.total,
+            "metodo_pago": getattr(compra, "metodo_pago", "Tarjeta") or "Tarjeta", 
         })
     return compras_con_usuario
 
