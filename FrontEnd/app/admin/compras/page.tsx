@@ -225,15 +225,28 @@ export default function AdminComprasPage() {
               <div>
                 <h3 className="text-lg font-semibold text-white mb-3">Productos</h3>
                 <div className="space-y-2">
-                  {selectedPurchase.productos.map((producto, index) => (
-                    <div key={index} className="bg-slate-700 rounded-lg p-4 flex justify-between items-center">
-                      <div>
-                        <p className="text-white font-medium">{producto.nombre}</p>
-                        <p className="text-gray-400 text-sm">Cantidad: {producto.cantidad}</p>
-                      </div>
-                      <p className="text-white font-bold">€{(producto.precio * producto.cantidad).toFixed(2)}</p>
-                    </div>
-                  ))}
+                  {isDetailsLoading ? (
+                    <div className="text-gray-400">Cargando productos...</div>
+                  ) : (
+                    purchaseDetails.length > 0 ? (
+                      purchaseDetails.map((producto, index) => (
+                        <div key={index} className="bg-slate-700 rounded-lg p-4 flex justify-between items-center">
+                          <div>
+                            <p className="text-white font-medium">{producto.nombre}</p>
+                            <p className="text-gray-400 text-sm">Cantidad: {producto.cantidad}</p>
+                          </div>
+                          <p className="text-white font-bold">
+                            €{(
+                              (Number(producto.precio_unitario ?? producto.precio ?? 0)) *
+                              Number(producto.cantidad)
+                            ).toFixed(2)}
+                          </p>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="text-gray-400">No hay productos en este pedido.</div>
+                    )
+                  )}
                 </div>
                 <div className="mt-4 bg-slate-700 rounded-lg p-4">
                   <div className="flex justify-between items-center">
